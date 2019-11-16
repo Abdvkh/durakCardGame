@@ -1,29 +1,36 @@
 from random import shuffle, choice
 
 global leftCardsNumber
+global playgroundsCards
+global cards
+
+playgroundsCards = []
 
 def printInfo():
     '''Prints all the avaliable info'''
 
     print(f"*Deck: {deck}\n\n*Left cards number: {leftCardsNumber}\n\n*Trump is {trump} \n\n*Player's deck: {playersDeck}\n\n*Computer's deck: {computersDeck}")
 
+#Function which declare playground of the game
 def playground(part, partsCard):#,isNotPlayground):
     '''Game\'s playground'''
 
-   # if isNotPlayground:
-    #  print('This is the playground: \n\n')
-     # isNotPlayground = False
+
+#    if isNotPlayground:
+#      print('This is the playground: \n\n')
+#      isNotPlayground = False
 
     print(part, ":", partsCard)
 
-    
-    
-#first 
+    defend(partsCard, computersDeck)
+
+#first
 def makeDeck():
     '''Creates and shuffles the deck and declares the trump'''
 
-    global deck;
-    global trump;
+    global deck
+    global trump
+    global cards
 
     deck = []
     suits = ['♠','♡','♢','♣']
@@ -34,7 +41,7 @@ def makeDeck():
     for suit in suits:
         for card in cards:
             deck.append(suit+card)
-    
+
     shuffle(deck)
 
 #second
@@ -53,13 +60,47 @@ def attack(part,partsDeck):
 
     #isNotPlayground = True
     partsDeckLength = len(partsDeck)
-    
-    index = int(input(f"Please choose the card you want to attack, just send the number from 0 till {partsDeckLength}\n>"))
+
+    while True:
+        index = int(input(f"Please choose the card you want to attack, just send the number from 1 till {partsDeckLength}\n>"))
+        index -= 1
+        if index <= partsDeckLength:
+            break
 
     chosenCard = partsDeck[index]
+    playersDeck.pop(index)
+    playgroundsCards.append(chosenCard)
     playground(part,chosenCard)
 
+def defend(partsCard, computersDeck):
+    playersSuit = partsCard[0]
+    playersValue = int(cards.get(partsCard[1]))
 
+    for card in computersDeck:
+        compsCardsSuit = card[0]
+        compsCardsValue = int(cards.get(card[1]))
+        rightCard = compsCardsSuit == playersSuit and compsCardsValue > playersValue
+        if rightCard:
+            cardsIndex = computersDeck.index(card)
+            defend = computersDeck.pop(cardsIndex)
+            playgroundsCards.append(defend)
+            playground('C', card)
+            break
+        elif compsCardsSuit == trump:
+            if compsCardsSuit == playersSuit and compsCardsValue > playersValue:
+                cardsIndex = computersDeck.index(card)
+                defend = computersDeck.pop(cardsIndex)
+                playgroundsCards.append(defend)
+                playground('C', card)
+                break
+            else:
+                cardsIndex = computersDeck.index(card)
+                defend = computersDeck.pop(cardsIndex)
+                playgroundsCards.append(defend)
+                playground('C', card)
+                break
+    else:
+            print("I cannot defend, so i'm gonna take that card")
 
 
 makeDeck()
