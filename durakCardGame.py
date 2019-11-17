@@ -3,6 +3,7 @@ from random import shuffle, choice
 global leftCardsNumber
 global playgroundsCards
 global cards
+cards = {'6': 6, '7': 7, '8': 8, '9': 9, '10': 10,'J': 11, 'Q': 12, 'K': 13, 'A': 14}
 
 playgroundsCards = []
 
@@ -14,7 +15,6 @@ def printInfo():
 #Function which declare playground of the game
 def playground(part, partsCard):#,isNotPlayground):
     '''Game\'s playground'''
-
 
 #    if isNotPlayground:
 #      print('This is the playground: \n\n')
@@ -30,12 +30,10 @@ def makeDeck():
 
     global deck
     global trump
-    global cards
 
     deck = []
     suits = ['♠','♡','♢','♣']
-    cards = {'6': 6, '7': 7, '8': 8, '9': 9, '10': 10,
-             'J': 11, 'Q': 12, 'K': 13, 'A': 14}
+
     trump = choice(suits)
 
     for suit in suits:
@@ -72,36 +70,39 @@ def attack(part,partsDeck):
     playgroundsCards.append(chosenCard)
     playground(part,chosenCard)
 
-def defend(partsCard, computersDeck):
-    playersSuit = partsCard[0]
-    playersValue = int(cards.get(partsCard[1]))
 
+def popAndAppend(card):
+    '''Pops card from the deck and appends it into the playgrounds cards, and then prints the output'''
+    cardsIndex = computersDeck.index(card)
+    defend = computersDeck.pop(cardsIndex)
+    playgroundsCards.append(defend)
+    playground('C', card)
+
+def rightCardChecker(playersSuit, playersValue, computersDeck):
+    '''Check if there is any avaliable card or not and prints the outcome'''
     for card in computersDeck:
         compsCardsSuit = card[0]
         compsCardsValue = int(cards.get(card[1]))
         rightCard = compsCardsSuit == playersSuit and compsCardsValue > playersValue
         if rightCard:
-            cardsIndex = computersDeck.index(card)
-            defend = computersDeck.pop(cardsIndex)
-            playgroundsCards.append(defend)
-            playground('C', card)
+            popAndAppend(card)
             break
         elif compsCardsSuit == trump:
             if compsCardsSuit == playersSuit and compsCardsValue > playersValue:
-                cardsIndex = computersDeck.index(card)
-                defend = computersDeck.pop(cardsIndex)
-                playgroundsCards.append(defend)
-                playground('C', card)
+                popAndAppend(card)
                 break
             else:
-                cardsIndex = computersDeck.index(card)
-                defend = computersDeck.pop(cardsIndex)
-                playgroundsCards.append(defend)
-                playground('C', card)
+                popAndAppend(card)
                 break
     else:
             print("I cannot defend, so i'm gonna take that card")
 
+def defend(partsCard, computersDeck):
+    """Defendfunction from the side of the computer"""
+    playersSuit = partsCard[0]
+    playersValue = int(cards.get(partsCard[1]))
+
+    rightCardChecker(playersSuit, playersValue, computersDeck)
 
 makeDeck()
 distinguishCard()
