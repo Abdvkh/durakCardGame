@@ -18,6 +18,7 @@ cards = {'6': 6, '7': 7, '8': 8, '9': 9, '10': 10,'J': 11, 'Q': 12, 'K': 13, 'A'
 playgroundsCards = []
 
 def runGame():
+    '''The first game which starts the game'''
     makeDeck()
     command = input('Now use the avaliable command:\
                      \nS - start\
@@ -42,6 +43,7 @@ def runGame():
             continue
 
 def commandHandler(command):
+    '''Commands which are used during the game'''
     while True:
         if command == 'A':
             attack('P', playersDeck)
@@ -113,7 +115,7 @@ def attack(part,partsDeck):
     while True:
         index  = int(input(f"Please choose the card you want to attack, just send the number from 1 till {partsDeckLength}\n>"))
         index -= 1
-        if index <= partsDeckLength:
+        if index >0 and index <= partsDeckLength:
             break
 
     chosenCard = partsDeck[index]
