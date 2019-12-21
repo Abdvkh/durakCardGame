@@ -8,14 +8,21 @@
 # [] - beaten
 # [] - settings
 
+import sys
 from random import shuffle, choice
 
 global playgroundsCards
-global cards
-
-cards = {'6': 6, '7': 7, '8': 8, '9': 9, '10': 10,'J': 11, 'Q': 12, 'K': 13, 'A': 14}
 
 playgroundsCards = []
+
+
+def delete_last_lines(n=1):
+    CURSOR_UP_ONE = '\x1b[1A'
+    ERASE_LINE    = '\x1b[2k'
+
+    for _ in range(n):
+        sys.stdout.write(CURSOR_UP_ONE)
+        sys.stdout.write(ERASE_LINE)
 
 def runGame():
     '''The first game which starts the game'''
@@ -65,6 +72,7 @@ def printInfo():
     leftCardsNumber = len(deck)
     print(f"*Deck: {deck}\n\n*Left cards number: {leftCardsNumber}\n\n*Trump is {trump} \n\n*Player's deck: {playersDeck}\n\n*Computer's deck: {computersDeck}")
 
+
 #Function which declare playground of the game
 def playground(part, partsCard):#,isNotPlayground):
     '''Game\'s playground'''
@@ -77,12 +85,16 @@ def playground(part, partsCard):#,isNotPlayground):
 
     defend(partsCard, computersDeck)
 
+
 #first
 def makeDeck():
     '''Creates and shuffles the deck and declares the trump'''
 
     global deck
     global trump
+    global cards
+
+    cards = {'6': 6, '7': 7, '8': 8, '9': 9, '10': 10,'J': 11, 'Q': 12, 'K': 13, 'A': 14}
 
     deck  = []
     suits = ['♠','♡','♢','♣']
@@ -95,6 +107,7 @@ def makeDeck():
 
     shuffle(deck)
 
+
 #second
 def distinguishCards():
     '''Distinguishes decks'''
@@ -104,6 +117,7 @@ def distinguishCards():
 
     playersDeck   = [deck.pop() for i in range(6)]
     computersDeck = [deck.pop() for i in range(6)]
+
 
 #third
 def attack(part,partsDeck):
@@ -115,7 +129,7 @@ def attack(part,partsDeck):
     while True:
         index  = int(input(f"Please choose the card you want to attack, just send the number from 1 till {partsDeckLength}\n>"))
         index -= 1
-        if index >0 and index <= partsDeckLength:
+        if index >= 0 and index <= partsDeckLength:
             break
 
     chosenCard = partsDeck[index]
@@ -124,31 +138,38 @@ def attack(part,partsDeck):
     playground(part,chosenCard)
 
 
-def popAndAppend(card):
+def popAndAppend(card, setOfCards):
     '''Pops card from the deck and appends it into the playgrounds cards, and then prints the output'''
     cardsIndex = computersDeck.index(card)
     defend     = computersDeck.pop(cardsIndex)
-    playgroundsCards.append(defend)
+    setOfCards.append(defend)
     playground('C', card)
+
 
 def rightCardChecker(playersSuit, playersValue, computersDeck):
     '''Check if there is any avaliable card or not and prints the outcome'''
     for card in computersDeck:
         compsCardsSuit  = card[0]
         compsCardsValue = int(cards.get(card[1]))
-        rightCard = compsCardsSuit == playersSuit and compsCardsValue > playersValue
+        rightCard       = compsCardsSuit == playersSuit and compsCardsValue > playersValue
+
         if rightCard:
-            popAndAppend(card)
+            popAndAppend(card, playgroundsCards)
             break
         elif compsCardsSuit == trump:
             if compsCardsSuit == playersSuit and compsCardsValue > playersValue:
-                popAndAppend(card)
+                popAndAppend(card, playgroundsCards)
+                break
+            elif compsCardsValue > playersValue:
+                popAndAppend(card, playgroundsCards)
                 break
             else:
                 print("I cannot defend, so i'm gonna take that card")
                 break
-    else:
+        else:
             print("I cannot defend, so i'm gonna take that card")
+            break
+
 
 def defend(partsCard, computersDeck):
     """Defendfunction from the side of the computer"""
